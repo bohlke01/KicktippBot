@@ -1,4 +1,2 @@
-__pycache__/
-.ipynb_checkpoints/
-.idea
-.venv
+# ignore credentials file
+src/kicktipp/credentials.py
