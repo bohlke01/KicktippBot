@@ -1,9 +1,11 @@
 """Extract Spielinfo data from a Kicktipp HTML page."""
+
 from bs4 import BeautifulSoup
 import os
 
 
 def open_tipps_page(session, with_spielinfo=False):
+    """Open the Tipp Übersicht page and optionally navigate to the Spielinfo page."""
     tipps_url = "https://www.kicktipp.de/dummy5/tippabgabe"
     tipps_response = session.get(tipps_url, timeout=10)
     tipps_response.raise_for_status()
@@ -24,6 +26,7 @@ def open_tipps_page(session, with_spielinfo=False):
 
 
 def extract_spielinfo(html_path):
+    """Extract Spielinfo data from a Kicktipp HTML page."""
     soup = BeautifulSoup(html_path, "html.parser")
 
     # 1. Quoten extrahieren
