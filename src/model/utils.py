@@ -1,5 +1,7 @@
 def sign(num: int) -> int:
+    """Return the sign of a number."""
     return 1 if num > 0 else -1 if num < 0 else 0
+
 
 def compute_score(x_home, x_away, y_home, y_away, default_scoring: bool = False) -> int:
     """Compute kicktipp score based on the outcome of a football match.
@@ -25,7 +27,9 @@ def compute_score(x_home, x_away, y_home, y_away, default_scoring: bool = False)
         return 0
 
 
-def compute_scores(y_pred: list[list[int]], y_target: list[list[int]], default_scoring: bool = False) -> list[int]:
+def compute_scores(
+    y_pred: list[list[int]], y_target: list[list[int]], default_scoring: bool = False
+) -> list[int]:
     """Compute the total score based on the predicted and target outcomes of football matches.
 
     Args:
@@ -37,6 +41,8 @@ def compute_scores(y_pred: list[list[int]], y_target: list[list[int]], default_s
     Returns:
         list[int]: List of scores for each match.
     """
-    scores = [compute_score(pred[0], pred[1], target[0], target[1], default_scoring) for pred, target in zip(y_pred, y_target)]
-    print("The total score is: ", sum(scores))
+    scores = [
+        compute_score(pred[0], pred[1], target[0], target[1], default_scoring)
+        for pred, target in zip(y_pred, y_target)
+    ]
     return scores

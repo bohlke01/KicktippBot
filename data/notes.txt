@@ -169,7 +169,7 @@ As above but with an additional "C" character following the bookmaker abbreviati
 Football-Data would like to acknowledge the following sources which have been utilised in the compilation of Football-Data's results and odds files.
 
 
-Current results (full time, half time)
+Current results (full-time, half-time)
 XScores - http://www.xscores .com
 
 Match statistics

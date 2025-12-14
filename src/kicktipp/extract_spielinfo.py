@@ -1,8 +1,30 @@
+"""Extract Spielinfo data from a Kicktipp HTML page."""
 from bs4 import BeautifulSoup
 import os
 
+
+def open_tipps_page(session, with_spielinfo=False):
+    tipps_url = "https://www.kicktipp.de/dummy5/tippabgabe"
+    tipps_response = session.get(tipps_url, timeout=10)
+    tipps_response.raise_for_status()
+
+    if not with_spielinfo:
+        print("Skipping Spielinfo retrieval as per configuration.")
+        # tippe_beste_quote(tipps_response.text)
+    else:
+        soup = BeautifulSoup(tipps_response.text, "html.parser")
+        spielinfo_link = soup.find(
+            "a", string=lambda t: t and "Tippabgabe mit Spielinfos" in t
+        )
+        if not spielinfo_link or not spielinfo_link.has_attr("href"):
+            raise Exception("'Spielinfo' link not found in the Tipp Übersicht page.")
+        spielinfo_url = "https://www.kicktipp.de" + spielinfo_link["href"]
+        spielinfo_response = session.get(spielinfo_url, timeout=10)
+        spielinfo_response.raise_for_status()
+
+
 def extract_spielinfo(html_path):
-    soup = BeautifulSoup(f, "html.parser")
+    soup = BeautifulSoup(html_path, "html.parser")
 
     # 1. Quoten extrahieren
     quoten = []
@@ -12,7 +34,9 @@ def extract_spielinfo(html_path):
             label = q.find("span", class_="quote-label")
             value = q.find("span", class_="quote-text")
             if label and value:
-                quoten.append({"Ergebnis": label.text.strip(), "Quote": value.text.strip()})
+                quoten.append(
+                    {"Ergebnis": label.text.strip(), "Quote": value.text.strip()}
+                )
 
     # 2. Letzte Ergebnisse extrahieren
     def get_ergebnisse(table_class):
@@ -26,13 +50,16 @@ def extract_spielinfo(html_path):
                     gegner = tds[1].text.strip()
                     team = tds[2].text.strip()
                     ergebnis = tds[3].text.strip()
-                    ergebnisse.append({
-                        "Wettbewerb": wettbewerb,
-                        "Gegner": gegner,
-                        "Team": team,
-                        "Ergebnis": ergebnis
-                    })
+                    ergebnisse.append(
+                        {
+                            "Wettbewerb": wettbewerb,
+                            "Gegner": gegner,
+                            "Team": team,
+                            "Ergebnis": ergebnis,
+                        }
+                    )
         return ergebnisse
+
     ergebnisse_heim = get_ergebnisse("spielinfoHeim")
     ergebnisse_gast = get_ergebnisse("spielinfoGast")
 
@@ -47,19 +74,17 @@ def extract_spielinfo(html_path):
                 verein = tds[1].text.strip()
                 tore = tds[4].text.strip()
                 diff = tds[5].text.strip()
-                tabelle.append({
-                    "Platz": platz,
-                    "Verein": verein,
-                    "Tore": tore,
-                    "Diff": diff
-                })
+                tabelle.append(
+                    {"Platz": platz, "Verein": verein, "Tore": tore, "Diff": diff}
+                )
 
     return {
         "Quoten": quoten,
         "Letzte Ergebnisse Heim": ergebnisse_heim,
         "Letzte Ergebnisse Gast": ergebnisse_gast,
-        "Tabelle": tabelle
+        "Tabelle": tabelle,
     }
+
 
 if __name__ == "__main__":
     html_path = os.path.join(os.path.dirname(__file__), "spielinfo.html")
@@ -76,4 +101,3 @@ if __name__ == "__main__":
     print("\nTabellenplatz und Torverhältnis:")
     for t in info["Tabelle"]:
         print(t)
-
